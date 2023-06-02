@@ -1,6 +1,7 @@
 const express = require('express');
 const { getAllUser, getUserById, createUser, upDataUserById, deleteUserById } = require('../service/user.service');
 const { bildResponse } = require('../helper/bildResponse');
+
 const route = express.Router();
 
 route.get('/', async (request, response) => {
