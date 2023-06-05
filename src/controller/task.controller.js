@@ -1,6 +1,7 @@
 const express = require('express');
-const { getAllTask, getTaskById, createTask, upDataTaskById, deleteTaskById } = require('../service/task.service')
+const { getAllTask, getTaskById, createTask, upDataTaskById, deleteTaskById, patchTask } = require('../service/task.service')
 const { bildResponse } = require('../helper/bildResponse');
+const { isValidTaskId, isValidTaskBody } = require('../helper/validation');
 
 const route = express.Router();
 
@@ -13,7 +14,7 @@ route.get('/', async (request, response) => {
     }
 })
 
-route.get('/:id', async (request, response) => {
+route.get('/:id', isValidTaskId, async (request, response) => {
     try {
         const { id } = request.params;
         const data = await getTaskById(id);
@@ -23,7 +24,7 @@ route.get('/:id', async (request, response) => {
     }
 })
 
-route.post('/', async (request, response) => {
+route.post('/', isValidTaskBody, async (request, response) => {
     try {
         const { task, user_id } = request.body;
         const data = await createTask(task, user_id);
@@ -33,7 +34,7 @@ route.post('/', async (request, response) => {
     }
 })
 
-route.put('/:id', async (request, response) => {
+route.put('/:id', isValidTaskId, isValidTaskBody, async (request, response) => {
     try {
         const { id } = request.params;
         const { task, user_id } = request.body;
@@ -44,10 +45,21 @@ route.put('/:id', async (request, response) => {
     }
 })
 
-route.delete('/:id', async (request, response) => {
+route.delete('/:id', isValidTaskId, async (request, response) => {
     try {
         const { id } = request.params;
         const data = await deleteTaskById(id);
+        bildResponse(response, 200, data);
+    } catch (error) {
+        bildResponse(response, 404, error.message);
+    }
+})
+
+route.patch('/:id', isValidTaskId, async (request, response) => {
+    try {
+        const { id } = request.params;
+        const clientData = request.body;
+        const data = await patchTask(id, clientData);
         bildResponse(response, 200, data);
     } catch (error) {
         bildResponse(response, 404, error.message);

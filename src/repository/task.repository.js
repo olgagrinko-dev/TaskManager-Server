@@ -1,3 +1,4 @@
+const { query } = require('express');
 const { pool } = require('../db');
 
 async function getAllTaskDB() {
@@ -35,4 +36,16 @@ async function deleteTaskByIdDB(id) {
     return result;
 }
 
-module.exports = { getAllTaskDB, getTaskByIdDB, createTaskDB, upDataTaskByIdDB, deleteTaskByIdDB };
+async function patchTaskDB(id, clientData) {
+    const client = await pool.connect();
+    const sql1 = 'select * from tasks where id = $1';
+    const result1 = (await client.query(sql1, [id])).rows;
+
+    const merge = {...result1[0], ...clientData};
+
+    const sql2 = 'UPDATE tasks set task = $1, user_id = $2 where id = $3 returning *';
+    const result2 = (await client.query(sql2, [merge.task, merge.user_id, id])).rows;
+    return result2;
+}
+
+module.exports = { getAllTaskDB, getTaskByIdDB, createTaskDB, upDataTaskByIdDB, deleteTaskByIdDB, patchTaskDB };
