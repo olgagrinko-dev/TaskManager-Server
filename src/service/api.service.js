@@ -1,7 +1,7 @@
 const { getUserByEmail, createUserDB } = require('../repository/api.repository');
 const bcrypt = require('bcrypt');
 
-const salt = 2;
+const salt = 1;
 
 async function createUser(name, surname, email, pwd) {
     const user = await getUserByEmail(email);
